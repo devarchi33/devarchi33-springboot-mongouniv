@@ -3,6 +3,7 @@ package com.devarchi33.mongouniv;
 import com.devarchi33.mongouniv.config.Properties;
 import com.devarchi33.mongouniv.domain.Person;
 import com.devarchi33.mongouniv.service.PersonService;
+import com.mongodb.WriteResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +41,10 @@ public class Application implements CommandLineRunner {
         int port = Integer.parseInt(mongoInfo.get("port"));
         logger.info("Mongo host : {}, port: {}", host, port);
 
+        test();
+    }
+
+    private void test() {
         mongoTemplate.dropCollection("persons");
 
         for (int i = 0; i < 10; i++) {
@@ -75,5 +80,14 @@ public class Application implements CommandLineRunner {
         for (Person person : sortedPersons) {
             logger.info("Sorted Age Person name: {}, age: {}, profession: {}", person.getName(), person.getAge(), person.getProfession());
         }
+
+        WriteResult updatedPerson = personService.upsertAgeByName("동훈2", 31);
+        logger.info("Update Person: {}", updatedPerson.toString());
+
+        WriteResult updatedPersons = personService.updateAllProfession(33, "개발자2");
+        logger.info("Update Persons: {}", updatedPerson.toString());
+
+        Person delPerson = personService.findByAge(31);
+        personService.deleteOne(delPerson);
     }
 }

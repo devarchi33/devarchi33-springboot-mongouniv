@@ -3,10 +3,13 @@ package com.devarchi33.mongouniv.service;
 import com.devarchi33.mongouniv.domain.Person;
 import com.devarchi33.mongouniv.persistance.PersonRepository;
 import com.mongodb.DBCollection;
+import com.mongodb.WriteResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -56,6 +59,34 @@ public class PersonService implements IPersonService {
         Query query = new Query();
         query.with(sort);
         return template.find(query, Person.class);
+    }
+
+    @Override
+    public WriteResult upsertAgeByName(String name, int age) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("name").is(name));
+        Update update = new Update();
+        update.set("age", age);
+        return template.upsert(query, update, Person.class);
+    }
+
+    @Override
+    public WriteResult updateAllProfession(int age, String profession) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("age").gte(age));
+        Update update = new Update();
+        update.set("profession", profession);
+        return template.updateMulti(query, update, Person.class);
+    }
+
+    @Override
+    public void deleteOne(Person person) {
+        repository.delete(person);
+    }
+
+    @Override
+    public void deleteAll() {
+        repository.deleteAll();
     }
 
     @Override
