@@ -15,4 +15,8 @@ public interface IGradeService {
 
     List<Grade> findAll(Sort sort);
 
+    void deleteOne(Grade grade);
+
+    long count();
+
 }

@@ -57,10 +57,19 @@ public class Application implements CommandLineRunner {
         sortList.add("score");
         Sort descScore = new Sort(Sort.Direction.DESC, sortList);
         List<Grade> grades = gradeService.findAll(descScore);
-
+        int i = 1;
         for (Grade grade : grades) {
+
+            /**
+             * mongo univ hw2-3
+             */
+            if (i % 4 == 0) {
+                gradeService.deleteOne(grade);
+            }
             logger.info("Grade student_id: {}, type: {}, score: {}", grade.getStudent_id(), grade.getType(), grade.getScore());
+            i++;
         }
+        logger.info("Grade count: {}", gradeService.count());
     }
 
     private void personTest() {

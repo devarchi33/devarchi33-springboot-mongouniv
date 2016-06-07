@@ -47,4 +47,14 @@ public class GradeService implements IGradeService {
     public List<Grade> findAll(Sort sort) {
         return repository.findAll(sort);
     }
+
+    @Override
+    public void deleteOne(Grade grade) {
+        repository.delete(grade);
+    }
+
+    @Override
+    public long count() {
+        return repository.count();
+    }
 }
