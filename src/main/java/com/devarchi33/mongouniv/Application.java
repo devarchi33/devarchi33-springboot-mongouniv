@@ -1,7 +1,9 @@
 package com.devarchi33.mongouniv;
 
 import com.devarchi33.mongouniv.config.Properties;
+import com.devarchi33.mongouniv.domain.Grade;
 import com.devarchi33.mongouniv.domain.Person;
+import com.devarchi33.mongouniv.service.GradeService;
 import com.devarchi33.mongouniv.service.PersonService;
 import com.mongodb.WriteResult;
 import org.slf4j.Logger;
@@ -14,6 +16,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -28,6 +31,8 @@ public class Application implements CommandLineRunner {
     private MongoTemplate mongoTemplate;
     @Autowired
     private PersonService personService;
+    @Autowired
+    private GradeService gradeService;
 
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
@@ -41,10 +46,24 @@ public class Application implements CommandLineRunner {
         int port = Integer.parseInt(mongoInfo.get("port"));
         logger.info("Mongo host : {}, port: {}", host, port);
 
-        test();
+        mongoTemplate.dropCollection("grades");
+        gradeService.insertJsonFile("classpath:grades.json");
+        gradeTest();
     }
 
-    private void test() {
+    private void gradeTest() {
+        List<String> sortList = new ArrayList<>();
+        sortList.add("student_id");
+        sortList.add("score");
+        Sort descScore = new Sort(Sort.Direction.DESC, sortList);
+        List<Grade> grades = gradeService.findAll(descScore);
+
+        for (Grade grade : grades) {
+            logger.info("Grade student_id: {}, type: {}, score: {}", grade.getStudent_id(), grade.getType(), grade.getScore());
+        }
+    }
+
+    private void personTest() {
         mongoTemplate.dropCollection("persons");
 
         for (int i = 0; i < 10; i++) {
