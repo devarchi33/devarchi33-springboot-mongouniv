@@ -1,7 +1,7 @@
 package com.devarchi33.mongouniv.service;
 
-import com.devarchi33.mongouniv.domain.Student;
-import com.devarchi33.mongouniv.persistance.StudentRepository;
+import com.devarchi33.mongouniv.domain.aggregation.AggStudent;
+import com.devarchi33.mongouniv.persistance.AggStudentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -12,18 +12,18 @@ import java.util.List;
  * Created by donghoon on 2016. 6. 8..
  */
 @Service
-public class StudentService implements IStudentService {
+public class AggStudentService implements IAggStudentService {
 
     @Autowired
-    private StudentRepository repository;
+    private AggStudentRepository repository;
 
     @Override
-    public Student save(Student student) {
+    public AggStudent save(AggStudent student) {
         return repository.save(student);
     }
 
     @Override
-    public List<Student> findAll(Sort sort) {
+    public List<AggStudent> findAll(Sort sort) {
 
         return repository.findAll(sort);
     }

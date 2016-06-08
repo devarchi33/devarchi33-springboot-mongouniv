@@ -1,6 +1,7 @@
 package com.devarchi33.mongouniv.service;
 
 import com.devarchi33.mongouniv.domain.Student;
+import org.springframework.data.domain.Sort;
 
 import java.util.List;
 
@@ -9,5 +10,7 @@ import java.util.List;
  */
 public interface IStudentService {
 
-    List<Student> findAll();
+    Student save(Student student);
+
+    List<Student> findAll(Sort sort);
 }
