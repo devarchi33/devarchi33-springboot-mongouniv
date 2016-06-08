@@ -1,9 +1,11 @@
 package com.devarchi33.mongouniv;
 
 import com.devarchi33.mongouniv.config.Properties;
+import com.devarchi33.mongouniv.domain.aggregation.AggStudent;
 import com.devarchi33.mongouniv.domain.Grade;
 import com.devarchi33.mongouniv.domain.Person;
 import com.devarchi33.mongouniv.domain.Student;
+import com.devarchi33.mongouniv.service.AggStudentService;
 import com.devarchi33.mongouniv.service.GradeService;
 import com.devarchi33.mongouniv.service.PersonService;
 import com.devarchi33.mongouniv.service.StudentService;
@@ -16,9 +18,13 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
+import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -37,6 +43,8 @@ public class Application implements CommandLineRunner {
     private GradeService gradeService;
     @Autowired
     private StudentService studentService;
+    @Autowired
+    private AggStudentService aggStudentService;
 
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
@@ -54,16 +62,56 @@ public class Application implements CommandLineRunner {
 //        gradeService.insertJsonFile("classpath:grades.json");
 //        gradeTest();
 
-        studentTest();
+        studentTestHW_1();
     }
 
-    private void studentTest() {
-        List<Student> students = studentService.findAll();
+    private void studentTestHW_1() {
+        Sort sort = new Sort(Sort.Direction.DESC, "_id");
+        List<Student> students = studentService.findAll(sort);
+        List<Student.Score> hw_scores = new ArrayList<>();
+
         for (Student student : students) {
             List<Student.Score> scores = student.getScores();
             for (Student.Score score : scores) {
-                logger.info("Score type: {}, score: {}", score.getType(), score.getScore());
+                if (score.getType().equals("homework")) {
+                    hw_scores.add(score);
+                    hw_scores.sort((o1, o2) -> (int) (o2.getScore() - o1.getScore()));
+                }
             }
+            for (Student.Score score : hw_scores) {
+                logger.info("Student id: {}, name: {}, HW Score type: {}, score: {}", student.getId(), student.getName(), score.getType(), score.getScore());
+            }
+
+            logger.info("hw_score size: {}", hw_scores.size());
+        }
+    }
+
+    private void studentTest() {
+        List<String> sortList = new ArrayList<>();
+        sortList.add("_id");
+        sortList.add("scores.score");
+        Sort sort = new Sort(Sort.Direction.DESC, sortList);
+        List<Student> students = studentService.findAll(sort);
+
+        for (Student student : students) {
+            List<Student.Score> scores = student.getScores();
+            for (Student.Score score : scores) {
+                logger.info("Student id: {}, name: {}, Score type: {}, score: {}", student.getId(), student.getName(), score.getType(), score.getScore());
+            }
+        }
+
+        AggregationOperation unwind = Aggregation.unwind("scores");
+        AggregationOperation aggSort = Aggregation.sort(Sort.Direction.ASC, "scores.score");
+        Aggregation aggregation = Aggregation.newAggregation(unwind, aggSort);
+        AggregationResults<AggStudent> aggStudents = mongoTemplate.aggregate(aggregation, mongoTemplate.getCollectionName(Student.class), AggStudent.class);
+
+        for (AggStudent student : aggStudents) {
+            /**
+             * aggregation 이후 _id duplicate 문제.
+             * TODO: group 이용하기.
+             */
+//            aggStudentService.save(student);
+            logger.info("AggStudent name: {}, type: {}, score: {}", student.getName(), student.getScores().getType(), student.getScores().getScore());
         }
     }
 

@@ -9,3 +9,5 @@ env: dev #test, dev
 spring:
   thymeleaf:
     cache: false
+server:
+  port: 8082
