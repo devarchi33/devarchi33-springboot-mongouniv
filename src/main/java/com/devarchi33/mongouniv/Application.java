@@ -3,8 +3,10 @@ package com.devarchi33.mongouniv;
 import com.devarchi33.mongouniv.config.Properties;
 import com.devarchi33.mongouniv.domain.Grade;
 import com.devarchi33.mongouniv.domain.Person;
+import com.devarchi33.mongouniv.domain.Student;
 import com.devarchi33.mongouniv.service.GradeService;
 import com.devarchi33.mongouniv.service.PersonService;
+import com.devarchi33.mongouniv.service.StudentService;
 import com.mongodb.WriteResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +35,8 @@ public class Application implements CommandLineRunner {
     private PersonService personService;
     @Autowired
     private GradeService gradeService;
+    @Autowired
+    private StudentService studentService;
 
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
@@ -46,9 +50,21 @@ public class Application implements CommandLineRunner {
         int port = Integer.parseInt(mongoInfo.get("port"));
         logger.info("Mongo host : {}, port: {}", host, port);
 
-        mongoTemplate.dropCollection("grades");
-        gradeService.insertJsonFile("classpath:grades.json");
-        gradeTest();
+//        mongoTemplate.dropCollection("grades");
+//        gradeService.insertJsonFile("classpath:grades.json");
+//        gradeTest();
+
+        studentTest();
+    }
+
+    private void studentTest() {
+        List<Student> students = studentService.findAll();
+        for (Student student : students) {
+            List<Student.Score> scores = student.getScores();
+            for (Student.Score score : scores) {
+                logger.info("Score type: {}, score: {}", score.getType(), score.getScore());
+            }
+        }
     }
 
     private void gradeTest() {
