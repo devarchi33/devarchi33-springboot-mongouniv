@@ -11,8 +11,6 @@ import java.util.List;
  */
 public interface IGradeService {
 
-    void insertJsonFile(String location) throws IOException;
-
     List<Grade> findAll(Sort sort);
 
     void deleteOne(Grade grade);

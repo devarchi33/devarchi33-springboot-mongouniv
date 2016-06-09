@@ -10,5 +10,7 @@ import java.util.List;
  */
 public interface IStudentService {
 
+    Student save(Student student);
+
     List<Student> findAll(Sort sort);
 }

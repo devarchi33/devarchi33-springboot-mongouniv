@@ -18,6 +18,11 @@ public class StudentService implements IStudentService {
     private StudentRepository repository;
 
     @Override
+    public Student save(Student student) {
+        return repository.save(student);
+    }
+
+    @Override
     public List<Student> findAll(Sort sort) {
 
         return repository.findAll(sort);
